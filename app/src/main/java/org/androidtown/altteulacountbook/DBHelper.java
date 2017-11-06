@@ -6,14 +6,11 @@ import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import java.sql.Date;
-
 /**
- * Created by DASOM on 2017-11-03.
+ * Created by DASOM on 2017-11-04.
  */
 
 public class DBHelper extends SQLiteOpenHelper {
-
 
     public DBHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
@@ -24,92 +21,68 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     @Override
-    public String getDatabaseName() {
-        return super.getDatabaseName();
-    }
-
-    @Override
-    public void setWriteAheadLoggingEnabled(boolean enabled) {
-        super.setWriteAheadLoggingEnabled(enabled);
-    }
-
-    @Override
-    public SQLiteDatabase getWritableDatabase() {
-        return super.getWritableDatabase();
-    }
-
-    @Override
-    public SQLiteDatabase getReadableDatabase() {
-        return super.getReadableDatabase();
-    }
-
-    @Override
-    public synchronized void close() {
-        super.close();
-    }
-
-    @Override
-    public void onConfigure(SQLiteDatabase db) {
-        super.onConfigure(db);
-    }
-
-    @Override
+    //income 은 boolean type 입니다. 0 또는 1 만 입력
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        sqLiteDatabase.execSQL("CREATE TABLE ACCOUNTBOOK (_id INTEGER PRIMARY KEY AUTOINCREMENT, price INTEGER, history TEXT, input INTEGER, date TEXT, note TEXT");
+        sqLiteDatabase.execSQL("CREATE TABLE accountBook (_id INTEGER PRIMARY KEY AUTOINCREMENT, price INTEGER, history TEXT, income INTEGER, date TEXT, note TEXT)");
     }
-    /*CREATE TABLE ACCOUNTBOOK (_id INTEGER PRIMARY KEY AUTOINCREMENT, price INTEGER, history TEXT, input INTEGER, date TEXT, note TEXT*/
+    //_id,price,hitory,input,date,note
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-
     }
 
-    @Override
-    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        super.onDowngrade(db, oldVersion, newVersion);
-    }
 
-    @Override
-    public void onOpen(SQLiteDatabase db) {
-        super.onOpen(db);
-    }
-
-    public  void insert(int price, String history, boolean input, Date date,String note ){
+    public void inSert(int price,String his,int income, String date, String note ){
         SQLiteDatabase db = getWritableDatabase();
-        int tmp=0;
-        if(input)
-            tmp=1;
-        String dateS = date.toString();
-        db.execSQL("INSERT INTO ACCOUNTBOOK VALUES(null,"+price+",'"+history+"',"+tmp+",'"+dateS+"','"+note+"');");
+        db.execSQL("INSERT INTO accountBook VALUES(null,"+price+",'"+his+"',"+income+",'"+date+"','"+note+"');");
         db.close();
     }
-    /*INSERT INTO ACCOUNTBOOK VALUES(null,price,'history',tmp,'dateS','note');*/
 
-    //history TEXT, price INTEGER, input INTEGER, date TEXT, note TEXT
-    public void update(int id, int price, String history, boolean input, Date date,String note ){
+    public void inSert(DBData data){
         SQLiteDatabase db = getWritableDatabase();
-        db.execSQL("UPDATE ACCOUNTBOOK " +
-                "SET price = "+price+", history = '"+history+"', input = "+input+", date = '"+date+"', note= '"+note+"' " +
-                "WHERE id == "+id+";");
+        db.execSQL("INSERT INTO accountBook VALUES(null,"+data.getPrice()+",'"+data.getHistory()+"',"+data.getIncome()+",'"+data.getDate()+"','"+data.getNote()+"');");
+        db.close();
     }
-    /*UPDATE ACCOUNTBOOK
-      SET price=INT, history= 'STRING',input=INT,date='STRING',note='STRING'
-      WHERE id==id;
-     */
 
-    public DBData[] getData(){
+    public void upDate(int id,int price,String his,boolean income, String date, String note){
+        SQLiteDatabase db = getWritableDatabase();
+        db.execSQL("UPDATE accountBook " +
+                "SET price = "+price+", history = '"+his+"', input = "+income+", date = '"+date+"', note= '"+note+"' " +
+                "WHERE _id = "+id+";");
+        db.close();
+    }
+
+    public void upDate(DBData data){
+        SQLiteDatabase db = getWritableDatabase();
+        db.execSQL("UPDATE accountBook " +
+                "SET price = "+data.getPrice()+", history = '"+data.getHistory()+"', input = "+data.getIncome()+", date = '"+data.getDate()+"', note= '"+data.getNote()+"' " +
+                "WHERE _id = "+data.getId()+";");
+        db.close();
+    }
+
+    public void deLete(int id){
+        SQLiteDatabase db = getWritableDatabase();
+        db.execSQL("DELETE FROM accountBook WHERE _id = "+id+";");
+        db.close();
+    }
+
+    public void deLete(DBData data){
+        SQLiteDatabase db = getWritableDatabase();
+        db.execSQL("DELETE FROM accountBook WHERE _id = "+data.getId()+";");
+        db.close();
+    }
+
+    public DBData[] selectAll(){
         SQLiteDatabase db = getReadableDatabase();
         DBData[] data;
-        Cursor cursor = db.rawQuery("SELECT *"+
-                                    "FROM ACCOUNTBOOK"
-                                    ,null);
-        int count = cursor.getCount();
-        data = new DBData[count];
-
-        for(int i=0;i<count;i++){
-            data[i]=new DBData(cursor.getInt(0),cursor.getInt(1),cursor.getString(2),cursor.getInt(3),cursor.getString(4),cursor.getString(5));//id,price,hitory,input,date,note
+        Cursor cursor = db.rawQuery("SELECT * FROM accountBOOK",null);
+        data = new DBData[cursor.getCount()];
+        /*for(int i = 0 ; cursor.moveToNext();i++){
+            data[i].setData(cursor);
+        }*/
+        for(int i=0;cursor.moveToNext();i++){
+            data[i]=new DBData(cursor);
         }
-
         return data;
     }
 }
