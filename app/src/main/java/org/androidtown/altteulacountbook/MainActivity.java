@@ -1,6 +1,7 @@
 package org.androidtown.altteulacountbook;
 
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -9,15 +10,23 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ListView;
+
+import com.google.android.gms.maps.model.LatLng;
 
 public class MainActivity extends AppCompatActivity {
     Toolbar toolbar;
     Fragment1 fragment1; Fragment2 fragment2; Fragment3 fragment3;
+    FloatingActionButton fab;
+    public static final int REQUEST_CODE_ADD = 101;
+    ///////////11-15/////
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,6 +77,20 @@ public class MainActivity extends AppCompatActivity {
             public void onTabReselected(TabLayout.Tab tab) { }
         });
 
+        fab=(FloatingActionButton)findViewById(R.id.fab);
 
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(),AddActivity.class);
+                startActivityForResult(intent,REQUEST_CODE_ADD);
+            }
+        });
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }
